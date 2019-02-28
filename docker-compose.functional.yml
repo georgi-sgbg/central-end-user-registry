@@ -3,7 +3,7 @@ services:
   central-end-user-registry:
     image: central-end-user-registry:latest
     environment:
-     CREG_DATABASE_URI: "postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}"
+     CREG_DATABASE_URI: "mysql://${MYSQL_USER}:${MYSQL_PASSWORD}@${MYSQL_HOST}:${MYSQL_PORT}/${MYSQL_DATABASE}"
      CREG_PORT: "3001"
      CREG_HOSTNAME: "http://central-end-user-registry"
 

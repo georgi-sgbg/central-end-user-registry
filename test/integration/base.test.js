@@ -4,12 +4,11 @@ const Test = require('tape')
 const Db = require('../../src/db')
 const Config = require('../../src/lib/config')
 
-Test('setup', setupTest => {
-  setupTest.test('connect to database', test => {
-    Db.connect(Config.DATABASE_URI).then(() => {
-      test.pass()
-      test.end()
-    })
+Test('setup', async setupTest => {
+  await setupTest.test('connect to database', async test => {
+    await Db.connect(Config.DATABASE_URI)
+    test.pass()
+    test.end()
   })
   setupTest.end()
 })

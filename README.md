@@ -23,8 +23,8 @@ The central directory has many options that can be configured through environmen
 
 | Environment variable | Description | Example values |
 | -------------------- | ----------- | ------ |
-| CREG\_DATABASE_URI   | The connection string for the database the central end user registry will use. Postgres is currently the only supported database. | postgres://\<username>:\<password>@localhost:5432/central_end_user_registry |
-| CREG\_PORT | The port the API server will run on. | 3000 |
+| CREG\_DATABASE_URI   | The connection string for the database the central end user registry will use. MySQL is currently the only supported database. | mysql://\<username>:\<password>@localhost:3306/central_end_user_registry |
+| CREG\_PORT | The port the API server will run on. | 3001 |
 | CREG\_HOSTNAME | The URI that will be used to create and validate links to resources on the central directory.  | http://central-directory |
 
 ## API

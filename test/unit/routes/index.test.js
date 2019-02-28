@@ -11,9 +11,9 @@ const assertRoute = (test, route, expected) => {
   test.equal(route.method, expected.method)
 }
 
-Test('routes module', routesTest => {
-  routesTest.test('register should', registerTest => {
-    registerTest.test('register routes with server', async function (test) {
+Test('routes module', async routesTest => {
+  await routesTest.test('register should', async registerTest => {
+    await registerTest.test('register routes with server', async function (test) {
       const routeSpy = Sinon.spy()
       const server = { route: routeSpy }
 

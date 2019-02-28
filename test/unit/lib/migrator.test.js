@@ -7,13 +7,13 @@ const Path = require('path')
 const Migrations = require('@mojaloop/central-services-database').Migrations
 const Proxyquire = require('proxyquire')
 
-Test('migrator', migratorTest => {
+Test('migrator', async migratorTest => {
   let sandbox
   let configuredMigrationsFolder
   let Migrator
 
   migratorTest.beforeEach(t => {
-    sandbox = Sinon.sandbox.create()
+    sandbox = Sinon.createSandbox()
     sandbox.stub(Migrations)
 
     configuredMigrationsFolder = 'migrations-path'
@@ -28,18 +28,19 @@ Test('migrator', migratorTest => {
     t.end()
   })
 
-  migratorTest.test('migrate should', migrateTest => {
-    migrateTest.test('override migrations directory path and run migrations', test => {
-      Migrations.migrate.returns(P.resolve())
-
-      let updatedMigrationsPath = Path.join(process.cwd(), configuredMigrationsFolder)
-
-      Migrator.migrate()
-        .then(() => {
-          test.ok(Migrations.migrate.calledOnce)
-          test.ok(Migrations.migrate.firstCall.args[0].migrations.directory, updatedMigrationsPath)
-          test.end()
-        })
+  await migratorTest.test('migrate should', async migrateTest => {
+    await migrateTest.test('override migrations directory path and run migrations', async test => {
+      try {
+        Migrations.migrate.returns(P.resolve())
+        let updatedMigrationsPath = Path.join(process.cwd(), configuredMigrationsFolder)
+        await Migrator.migrate()
+        test.ok(Migrations.migrate.calledOnce)
+        test.ok(Migrations.migrate.firstCall.args[0].migrations.directory, updatedMigrationsPath)
+        test.end()
+      } catch (e) {
+        test.fail()
+        test.end()
+      }
     })
 
     migrateTest.end()

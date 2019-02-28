@@ -24,8 +24,8 @@
 8. Deploy Ingress
     `minikube addon enable ingress`
 
-9. Configure PostgreSQL
-    Edit `postgresUser` & `postgresPassword` as desired in the following file `./deploy/helm/central-end-user-registry-helm-postgresql-values.yaml` 
+9. Configure MySQL
+    Edit `mysqlUser` & `mysqlPassword` as desired in the following file `./deploy/helm/central-end-user-registry-helm-mysql-values.yaml` 
 
 10. Deploy PosgreSQL
     `helm install --name central-end-user-registry -f ./deploy/helm/central-end-user-registry-helm-postgresql-values.yaml stable/postgresql`

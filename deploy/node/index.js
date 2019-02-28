@@ -6,8 +6,8 @@ const Ecs = require('./ecs')
 const Jfrog = require('./jfrog')
 const Variables = require('./variables')
 
-const pushService = ({IMAGE, NAME, PORT}, version) => {
-  const databaseUri = `postgres://${Variables.POSTGRES_USER}:${Variables.POSTGRES_PASSWORD}@${Variables.POSTGRES_HOST}:5432/central_end_user_registry`
+const pushService = ({ IMAGE, NAME, PORT }, version) => {
+  const databaseUri = `mysql://${Variables.MYSQL_USER}:${Variables.MYSQL_PASSWORD}@${Variables.MYSQL_HOST}:3306/central_end_user_registry`
   const envVariables = [
     {
       name: 'CREG_DATABASE_URI',

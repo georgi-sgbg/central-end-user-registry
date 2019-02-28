@@ -46,5 +46,9 @@ Dockerfile.old
 .vscode
 .vs_code
 
+# IntelliJ
+.idea/
+**/*.iml
+
 # npm
-package-lock.json
+#package-lock.json

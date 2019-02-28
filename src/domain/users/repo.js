@@ -2,14 +2,13 @@
 
 const Db = require('../../db')
 
-exports.getAll = () => {
+exports.getAll = async () => {
   return Db.users.find({}, { order: 'number asc' })
 }
 
-exports.getByNumber = (number) => {
+exports.getByNumber = async (number) => {
   return Db.users.find({ number }, { order: 'dfspIdentifier asc' })
 }
-
-exports.create = (user) => {
+exports.create = async (user) => {
   return Db.users.insert(user)
 }

@@ -3,4 +3,4 @@ services:
   central-registry:
     image: ${DOCKER_IMAGE}:latest
     environment:
-     CREG_DATABASE_URI: "postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/central_registry_functional"
+     CREG_DATABASE_URI: "mysql://${MYSQL_USER}:${MYSQL_PASSWORD}@mysql:3306/central_registry_functional"

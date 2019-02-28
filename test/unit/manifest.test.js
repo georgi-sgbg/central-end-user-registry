@@ -8,7 +8,7 @@ let getManifest = () => {
   return require('../../src/manifest')
 }
 
-Test('manifest', function (manifestTest) {
+Test('manifest', async function (manifestTest) {
   manifestTest.beforeEach(t => {
     t.end()
   })
@@ -18,21 +18,21 @@ Test('manifest', function (manifestTest) {
     t.end()
   })
 
-  manifestTest.test('should', function (connectionsTest) {
-    connectionsTest.test('have server section', function (assert) {
+  await manifestTest.test('should', async function (connectionsTest) {
+    await connectionsTest.test('have server section', async function (assert) {
       let Manifest = getManifest()
       assert.ok(Manifest.server)
       assert.end()
     })
 
-    connectionsTest.test('have one server with configured port', function (assert) {
+    await connectionsTest.test('have one server with configured port', async function (assert) {
       let Manifest = getManifest()
       assert.equal(typeof Manifest.server, 'object')
       assert.equal(Manifest.server.port, Config.PORT)
       assert.end()
     })
 
-    connectionsTest.test('have server validation fail action throwing Boom serverError', async function (assert) {
+    await connectionsTest.test('have server validation fail action throwing Boom serverError', async function (assert) {
       let Manifest = getManifest()
       try {
         let _
@@ -48,7 +48,7 @@ Test('manifest', function (manifestTest) {
     connectionsTest.end()
   })
 
-  manifestTest.test('should', function (registrationsTest) {
+  await manifestTest.test('should', async function (registrationsTest) {
     let Manifest
 
     registrationsTest.beforeEach(t => {
@@ -56,27 +56,27 @@ Test('manifest', function (manifestTest) {
       t.end()
     })
 
-    registrationsTest.test('have register section', function (assert) {
+    await registrationsTest.test('have register section', async function (assert) {
       assert.ok(Manifest.register)
       assert.end()
     })
 
-    registrationsTest.test('register inert plugin', function (assert) {
+    await registrationsTest.test('register inert plugin', async function (assert) {
       assert.ok(findPluginByPath(Manifest.register.plugins, 'inert'))
       assert.end()
     })
 
-    registrationsTest.test('register vision plugin', function (assert) {
+    await registrationsTest.test('register vision plugin', async function (assert) {
       assert.ok(findPluginByPath(Manifest.register.plugins, 'vision'))
       assert.end()
     })
 
-    registrationsTest.test('register routes', function (assert) {
+    await registrationsTest.test('register routes', async function (assert) {
       assert.ok(findPluginByPath(Manifest.register.plugins, './routes'))
       assert.end()
     })
 
-    registrationsTest.test('register hapi-swagger plugin', function (assert) {
+    await registrationsTest.test('register hapi-swagger plugin', async function (assert) {
       let found = findPluginByRegisterName(Manifest.register.plugins, 'hapi-swagger')
 
       assert.ok(found)
@@ -85,7 +85,7 @@ Test('manifest', function (manifestTest) {
       assert.end()
     })
 
-    registrationsTest.test('register blipp plugin', function (assert) {
+    await registrationsTest.test('register blipp plugin', async function (assert) {
       assert.ok(findPluginByPath(Manifest.register.plugins, 'blipp'))
       assert.end()
     })

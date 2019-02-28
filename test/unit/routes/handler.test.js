@@ -8,11 +8,11 @@ const NotFoundError = require('@mojaloop/central-services-shared').NotFoundError
 const Handler = require('../../../src/routes/handler')
 const Service = require('../../../src/domain/users/service')
 
-Test('routes handler test', handlerTest => {
+Test('routes handler test', async handlerTest => {
   let sandbox
 
   handlerTest.beforeEach(test => {
-    sandbox = Sinon.sandbox.create()
+    sandbox = Sinon.createSandbox()
     sandbox.stub(Service)
     test.end()
   })
@@ -22,8 +22,8 @@ Test('routes handler test', handlerTest => {
     test.end()
   })
 
-  handlerTest.test('health should', healthTest => {
-    healthTest.test('return status: OK', async function (test) {
+  await handlerTest.test('health should', async healthTest => {
+    await healthTest.test('return status: OK', async function (test) {
       const h = {
         response: (output) => {
           test.equal(output.status, 'OK')
@@ -36,8 +36,8 @@ Test('routes handler test', handlerTest => {
     healthTest.end()
   })
 
-  handlerTest.test('getUsers should', getUsersTest => {
-    getUsersTest.test('returns users from Service', async function (test) {
+  await handlerTest.test('getUsers should', async getUsersTest => {
+    await getUsersTest.test('returns users from Service', async function (test) {
       const number = '12345678'
       const dfspIdentifier = '001:123'
       const user = { id: 1, number, dfspIdentifier }
@@ -55,8 +55,8 @@ Test('routes handler test', handlerTest => {
     getUsersTest.end()
   })
 
-  handlerTest.test('getUserByNumber should', userByNumberTest => {
-    userByNumberTest.test('return user from Service.getByNumber', async function (test) {
+  await handlerTest.test('getUserByNumber should', async userByNumberTest => {
+    await userByNumberTest.test('return user from Service.getByNumber', async function (test) {
       const number = '12345678'
       const dfspIdentifier = '001:123'
       const user = { id: 1, number, dfspIdentifier }
@@ -76,7 +76,7 @@ Test('routes handler test', handlerTest => {
       await Handler.getUserByNumber(request, h)
     })
 
-    userByNumberTest.test('return NotFoundError if users is null', async function (test) {
+    await userByNumberTest.test('return NotFoundError if users is null', async function (test) {
       const number = '12345678'
       await Service.getByNumber.returns(P.resolve(null))
 
@@ -89,12 +89,12 @@ Test('routes handler test', handlerTest => {
         await Handler.getUserByNumber(request, h)
       } catch (err) {
         test.ok(err instanceof NotFoundError)
-        test.equal(err.message, 'The requested number does not exist')
+        test.equal(err.message, 'The requested resource could not be found.')
         test.end()
       }
     })
 
-    userByNumberTest.test('return NotFoundError if users is empty', async function (test) {
+    await userByNumberTest.test('return NotFoundError if users is empty', async function (test) {
       const number = '12345678'
       await Service.getByNumber.returns(P.resolve([]))
 
@@ -107,7 +107,7 @@ Test('routes handler test', handlerTest => {
         await Handler.getUserByNumber(request, h)
       } catch (err) {
         test.ok(err instanceof NotFoundError)
-        test.equal(err.message, 'The requested number does not exist')
+        test.equal(err.message, 'The requested resource could not be found.')
         test.end()
       }
     })
@@ -115,13 +115,20 @@ Test('routes handler test', handlerTest => {
     userByNumberTest.end()
   })
 
-  handlerTest.test('registerIdentifier should', registerIdentifierTest => {
-    registerIdentifierTest.test('register user with Service', async function (test) {
+  await handlerTest.test('registerIdentifier should', async registerIdentifierTest => {
+    await registerIdentifierTest.test('register user with Service', async function (test) {
       const number = '12345678'
       const dfspIdentifier = '001:123'
       const user = { id: 2, dfspIdentifier, number }
+      const requestedUser = [
+        {
+          number,
+          dfspIdentifier
+        }
+      ]
 
       await Service.register.withArgs(Sinon.match({ number, dfspIdentifier })).returns(P.resolve(user))
+      Service.getByNumber.withArgs(number).returns(requestedUser)
 
       const request = {
         payload: { number, dfspIdentifier }
@@ -141,7 +148,7 @@ Test('routes handler test', handlerTest => {
       await Handler.registerIdentifier(request, h)
     })
 
-    registerIdentifierTest.test('throw NotFoundException if directory yields empty', async function (test) {
+    await registerIdentifierTest.test('throw NotFoundException if directory yields empty', async function (test) {
       const number = '12345678'
       const dfspIdentifier = '001:123'
 

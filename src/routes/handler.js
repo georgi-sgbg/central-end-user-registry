@@ -5,7 +5,7 @@ const NotFoundError = require('@mojaloop/central-services-shared').NotFoundError
 
 const usersResponse = (users) => {
   if (!users || users.length === 0) {
-    throw new NotFoundError('The requested number does not exist')
+    throw new NotFoundError('The requested resource could not be found.')
   }
   return users.map(userResponse)
 }
@@ -28,8 +28,9 @@ const getUserByNumber = async function (request, h) {
 }
 
 const registerIdentifier = async function (request, h) {
-  const user = await Service.register(request.payload)
-  return h.response(userResponse(user)).code(201)
+  await Service.register(request.payload)
+  const user = await Service.getByNumber(request.payload.number)
+  return h.response(userResponse(user[0])).code(201)
 }
 
 const health = async function (request, h) {

@@ -6,7 +6,7 @@ defaults_working_directory: &defaults_working_directory
 
 defaults_docker_node: &defaults_docker_node
   docker:
-    - image: mhart/alpine-node:8.9.4
+    - image: mhart/alpine-node:10.15.1
 
 defaults_docker_helm_kube: &defaults_docker_helm_kube
   docker:
@@ -237,8 +237,8 @@ jobs:
     <<: *defaults_working_directory
     steps:
       - run:
-          name: Add the Postgres 9.6 binaries to the path.
-          command: echo ‘/usr/lib/postgresql/9.6/bin/:$PATH’ >> $BASH_ENV
+          name: Add the MySQL 5.7 binaries to the path.
+          command: echo ‘/usr/lib/mysql/5.7/bin/:$PATH’ >> $BASH_ENV
       - run:
           name: Install Docker Compose
           command: |
@@ -271,7 +271,7 @@ jobs:
 #     #       name: Install general dependencies
 #     #       command: *defaultDependencies
 #     #   - run:
-#     #       name: Add the Postgres 9.6 binaries to the path.
+#     #       name: Add the MySQL 5.7 binaries to the path.
 #     #       command: apk --no-cache add postgresql-client
 #     #   - setup_remote_docker
 #     #   - run:
@@ -287,8 +287,8 @@ jobs:
 #     #       command: |
 #     #         curl -L https://github.com/docker/compose/releases/download/1.8.0/docker-compose-`uname -s`-`uname -m` > /usr/local/bin/docker-compose; chmod +x /usr/local/bin/docker-compose
 #       - run:
-#           name: Add the Postgres 9.6 binaries to the path.
-#           command: echo ‘/usr/lib/postgresql/9.6/bin/:$PATH’ >> $BASH_ENV
+#           name: Add the MySQL 5.7 binaries to the path.
+#           command: echo ‘/usr/lib/mysql/5.7/bin/:$PATH’ >> $BASH_ENV
 #       - run:
 #           name: Install Docker Compose
 #           command: |

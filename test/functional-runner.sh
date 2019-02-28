@@ -8,13 +8,13 @@ if [ $# -ne 1 ]; then
     echo " - DOCKER_TAG: Tag/Version of Image"
     echo " - DOCKER_FILE: Recipe to be used for Docker build"
     echo " - DOCKER_WORKING_DIR: Docker working directory"
-    echo " - POSTGRES_USER: Posgres user"
-    echo " - POSTGRES_PASSWORD: Posgres password"
-    echo " - POSTGRES_HOST: Posgres host name"
-    echo " - POSTGRES_PORT: Posgres container port"
-    echo " - POSTGRES_DB: Posgres database"
-    echo " - POSTGRES_IMAGE: Docker Image for Posgres"
-    echo " - POSTGRES_TAG: Docker tag/version for Posgres"
+    echo " - MYSQL_USER: MySQL user"
+    echo " - MYSQL_PASSWORD: MySQL password"
+    echo " - MYSQL_HOST: MySQL host name"
+    echo " - MYSQL_PORT: MySQL container port"
+    echo " - MYSQL_DATABASE: MySQL database"
+    echo " - MYSQL_IMAGE: Docker Image for MySQL"
+    echo " - MYSQL_TAG: Docker tag/version for MySQL"
     echo " - APP_HOST: Application host name"
     echo " - APP_DIR_TEST_RESULTS: Location of test results relative to the working directory"
     echo " - TEST_CMD: Functional test command to be executed"
@@ -35,33 +35,32 @@ cat $1
 >&2 echo "Creating local directory to store test results"
 mkdir -p test/results
 
-fpsql() {
-	docker run --rm -i \
-		--entrypoint psql \
-    --link $POSTGRES_HOST \
-    -e PGUSER=$POSTGRES_USER \
-    -e PGPASSWORD=$POSTGRES_PASSWORD \
-    -e PGDATABASE=$POSTGRES_DB \
-    "$POSTGRES_IMAGE:$POSTGRES_TAG" \
-    --host $POSTGRES_HOST \
-		--username $POSTGRES_USER \
-    --dbname $POSTGRES_DB \
-		--quiet --no-align --tuples-only \
+fsql() {
+	docker run -it --rm \
+    --link $MYSQL_HOST:mysql \
+    -e MYSQL_HOST=$MYSQL_HOST \
+    -e MYSQL_PORT=$MYSQL_PORT \
+    -e MYSQL_PASSWORD=$MYSQL_PASSWORD \
+    -e MYSQL_USER=$MYSQL_USER \
+    -e MYSQL_DATABASE=$MYSQL_DATABASE \
+    -e MYSQL_ALLOW_EMPTY_PASSWORD=true \
+    mysql \
+    sh -c \
 		"$@"
 }
 
-is_psql_up() {
-    fpsql -c '\l' > /dev/null 2>&1
+is_db_up() {
+    fsql 'mysql -h"$MYSQL_HOST" -P"$MYSQL_PORT" -u"$MYSQL_USER" -p"$MYSQL_PASSWORD" -e "select 1"' > /dev/null 2>&1
 }
 
 ftest() {
 	docker run --rm -i \
-    --link $POSTGRES_HOST \
-    --env POSTGRES_USER="$POSTGRES_USER" \
-    --env POSTGRES_PASSWORD="$POSTGRES_PASSWORD" \
-    --env POSTGRES_HOST="$POSTGRES_HOST" \
-    --env POSTGRES_PORT="$POSTGRES_PORT" \
-    --env POSTGRES_DB="$POSTGRES_DB" \
+    --link $MYSQL_HOST \
+    --env MYSQL_USER="$MYSQL_USER" \
+    --env MYSQL_PASSWORD="$MYSQL_PASSWORD" \
+    --env MYSQL_HOST="$MYSQL_HOST" \
+    --env MYSQL_PORT="$MYSQL_PORT" \
+    --env MYSQL_DATABASE="$MYSQL_DATABASE" \
 		"$DOCKER_IMAGE:$DOCKER_TAG" \
     /bin/sh \
     -c \
@@ -69,8 +68,8 @@ ftest() {
 }
 
 stop_docker() {
-  >&2 echo "Posgres-functional is shutting down $POSTGRES_HOST"
-  (docker stop $POSTGRES_HOST && docker rm $POSTGRES_HOST) > /dev/null 2>&1
+  >&2 echo "MySQL-functional is shutting down $MYSQL_HOST"
+  (docker stop $MYSQL_HOST && docker rm $MYSQL_HOST) > /dev/null 2>&1
   >&2 echo "$APP_HOST environment is shutting down"
   (docker stop $APP_HOST && docker rm $APP_HOST) > /dev/null 2>&1
   (docker stop $APP_TEST_HOST && docker rm $APP_TEST_HOST) > /dev/null 2>&1
@@ -85,43 +84,48 @@ clean_docker() {
 fcurl() {
 	docker run --rm -i \
 		--link $APP_HOST \
-		--entrypoint curl \
-		"jlekie/curl:latest" \
-        --output /dev/null --silent --head --fail \
+    --entrypoint curl \
+    "jlekie/curl:latest" \
+    --silent --head --fail \
 		"$@"
 }
 
 is_api_up() {
-    fcurl "http://$APP_HOST:$APP_PORT/health?"
+    fcurl "http://$APP_HOST:3001/health?"
 }
 
 run_test_command()
 {
- >&2 echo "Running $APP_HOST Test command: $TEST_CMD"
- docker run -i \
-   --link $APP_HOST \
-   --name $APP_TEST_HOST \
-   --env HOST_IP="$APP_HOST" \
-   --env CREG_DATABASE_URI="postgres://$POSTGRES_USER:$POSTGRES_PASSWORD@$POSTGRES_HOST:$POSTGRES_PORT/$POSTGRES_DB" \
-   $DOCKER_IMAGE:$DOCKER_TAG \
-   /bin/sh \
-   -c "source test/.env; $TEST_CMD"
+  echo "mysql://$MYSQL_USER:$MYSQL_PASSWORD@$MYSQL_HOST:$MYSQL_PORT/$MYSQL_DATABASE"
+
+  >&2 echo "Running $APP_HOST Test command: $TEST_CMD"
+  docker run -i \
+    --link $APP_HOST \
+    --link $MYSQL_HOST \
+    --name $APP_TEST_HOST \
+    --env HOST_IP="$APP_HOST" \
+    --env CREG_DATABASE_URI="mysql://$MYSQL_USER:$MYSQL_PASSWORD@$MYSQL_HOST:$MYSQL_PORT/$MYSQL_DATABASE" \
+    $DOCKER_IMAGE:$DOCKER_TAG \
+    /bin/sh \
+    -c "source test/.env; $TEST_CMD"
 }
 
 start_central_registry () {
   docker run -d -i \
-    --link $POSTGRES_HOST \
+    --link $MYSQL_HOST \
     --name $APP_HOST \
-    --env POSTGRES_USER="$POSTGRES_USER" \
-    --env POSTGRES_PASSWORD="$POSTGRES_PASSWORD" \
-    --env POSTGRES_HOST="$POSTGRES_HOST" \
-    --env POSTGRES_PORT="$POSTGRES_PORT" \
-    --env POSTGRES_DB="$POSTGRES_DB" \
+    --env MYSQL_USER="$MYSQL_USER" \
+    --env MYSQL_PASSWORD="$MYSQL_PASSWORD" \
+    --env MYSQL_HOST="$MYSQL_HOST" \
+    --env MYSQL_PORT="$MYSQL_PORT" \
+    --env MYSQL_DATABASE="$MYSQL_DATABASE" \
     -p $APP_PORT:$APP_PORT \
 		$DOCKER_IMAGE:$DOCKER_TAG \
     /bin/sh \
     -c "source test/.env; $APP_CMD"
 }
+
+# Script execution
 
 >&2 echo "Building Docker Image $DOCKER_IMAGE:$DOCKER_TAG with $DOCKER_FILE"
 docker build --no-cache -t $DOCKER_IMAGE:$DOCKER_TAG -f $DOCKER_FILE .
@@ -134,18 +138,18 @@ then
 fi
 
 stop_docker
->&2 echo "Postgres is starting"
-docker run --name $POSTGRES_HOST -d -p $POSTGRES_PORT:$POSTGRES_PORT -e POSTGRES_PASSWORD=$POSTGRES_PASSWORD -e POSTGRES_USER=$POSTGRES_USER -e POSTGRES_DB=$POSTGRES_DB "$POSTGRES_IMAGE:$POSTGRES_TAG" > /dev/null 2>&1
+>&2 echo "mysql is starting"
+docker run --name $MYSQL_HOST -d -p $MYSQL_PORT:$MYSQL_PORT -e MYSQL_PASSWORD=$MYSQL_PASSWORD -e MYSQL_USER=$MYSQL_USER -e MYSQL_DATABASE=$MYSQL_DATABASE -e MYSQL_ALLOW_EMPTY_PASSWORD=true $MYSQL_IMAGE:$MYSQL_TAG > /dev/null 2>&1
 
 if [ "$?" != 0 ]
 then
-  >&2 echo "Starting Postgres failed...exiting"
+  >&2 echo "Starting mysql failed...exiting"
   clean_docker
   exit 1
 fi
 
-until is_psql_up; do
-  >&2 echo "Postgres is unavailable - sleeping"
+until is_db_up; do
+  >&2 echo "mysql is unavailable - sleeping"
   sleep 1
 done
 
@@ -168,8 +172,9 @@ until is_api_up; do
   sleep 5
 done
 
->&2 echo " Functional tests are starting"
+>&2 echo "Functional tests are starting"
 run_test_command
+
 test_exit_code=$?
 
 >&2 echo "Displaying test logs"

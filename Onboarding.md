@@ -13,7 +13,7 @@ In this document we'll walk through the setup for the Central End User Registry.
 1. Github
 2. brew
 3. Docker
-4. PostgreSQL 9.4
+4. MySQL
 5. pgAdmin4
 6. Visual Studio Code
 7. nvm
@@ -35,22 +35,12 @@ To install Docker, follow these instructions: [Docker for Mac](https://docs.dock
 To install Visual Studio Code, follow these instructions: [Visual Studio Code](http://code.visualstudio.com)
 
 ##### Setup Docker
-* create a *docker-compose.yml* file that looks like this:
+* Run the following commands in your terminal.
 ```
-version: '2'
-services:
-  postgres:
-    ports:
-     - "5432:5432"
-    image: postgres:9.4
-    environment:
-     - POSTGRES_PASSWORD=postgres
-     - POSTGRES_USER=postgres
+docker run -p 3306:3306 -d --name mysql -e MYSQL_USER=central_end_user_registry -e MYSQL_PASSWORD=cVq8iFqaLuHy8jjKuA -e MYSQL_DATABASE=central_end_user_registry -e MYSQL_ALLOW_EMPTY_PASSWORD=true mysql/mysql-server:5.7
 ```
-* run `docker-compose up -d` from the folder where *docker-compose.yml* is located.
-* PostgreSQL 9.4 should now be installed
+* MySQL should now be installed
 * run `docker ps` to verify Docker is running
-* to install *pgAdmin4*, run `brew cask pgAdmin4`
 
 ##### Setup pgAdmin4
 * create a central_end_user_registry user by right clicking on **Login/Group Roles** and then **Create**
@@ -66,11 +56,11 @@ services:
 ```
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh" # This loads nvm
-export CREG_DATABASE_URI=postgres://central_end_user_registry:cVq8iFqaLuHy8jjKuA@localhost:5432/central_end_user_registry
+export CREG_DATABASE_URI=mysql://central_end_user_registry:cVq8iFqaLuHy8jjKuA@localhost:3306/central_end_user_registry
 ```
 
 * cd into the central_directory project
-* run `nvm install 8.9.4`
+* run `nvm install 10.15.1`
 * run `nvm use`
 * run `npm install -g node-gyp`
 * run `brew install libtool autoconf automake`

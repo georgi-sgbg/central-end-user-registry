@@ -1,4 +1,4 @@
-FROM mhart/alpine-node:8.9.4
+FROM mhart/alpine-node:10.15.1
 USER root
 
 WORKDIR /opt/central-end-user-registry
@@ -7,6 +7,7 @@ COPY migrations /opt/central-end-user-registry/migrations
 COPY config /opt/central-end-user-registry/config
 COPY package.json server.sh /opt/central-end-user-registry/
 COPY test /opt/central-end-user-registry/test
+COPY seeds /opt/central-end-user-registry/seeds
 
 RUN chmod +x /opt/central-end-user-registry/server.sh && \
     apk --no-cache add git

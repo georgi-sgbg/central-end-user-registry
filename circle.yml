@@ -9,7 +9,7 @@ machine:
   services:
     - docker
   node:
-    version: 8.9.4
+    version: 10.15.1
   environment:
     AWS_ACCOUNT_ID: 886403637725
     APP_NAME: central-end-user-registry

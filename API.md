@@ -45,7 +45,7 @@ POST http://central-directory/commands/register HTTP/1.1
 Content-Type: application/json
 {
   "number": "12345679",
-  "dfspIdentifer": "001:124"
+  "dfspIdentifier": "001:124"
 }
 ```
 
@@ -55,7 +55,7 @@ HTTP/1.1 201 CREATED
 Content-Type: application/json
 {
   "number": "123456789",
-  "dfspIdentifer": "001:124"
+  "dfspIdentifier": "001:124"
 }
 ```
 
@@ -97,7 +97,7 @@ HTTP/1.1 200 OK
 [
   {
     "number": "12345678",
-    "dfspIdentifer": "001:123"
+    "dfspIdentifier": "001:123"
   }
 ]
 ```
@@ -136,7 +136,7 @@ HTTP/1.1 200 OK
 [
   {
     "number": "12345678",
-    "dfspIdentifer": "001:123"
+    "dfspIdentifier": "001:123"
   },
   {
     "number": "90123456",
@@ -153,7 +153,7 @@ HTTP/1.1 200 OK
 Get the current status of the service
 
 #### HTTP Request
-`GET http://central-ledger/health`
+`GET http://central-end-user-registry/health`
 
 #### Response 200 OK
 | Field | Type | Description |
