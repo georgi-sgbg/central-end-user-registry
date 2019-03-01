@@ -1,7 +1,7 @@
 {
   "name": "@mojaloop/central-end-user-registry",
   "version": "5.2.0",
-  "description": "Central end user registry",
+  "description": "Central end user registry.",
   "license": "Apache-2.0",
   "private": true,
   "repository": {
