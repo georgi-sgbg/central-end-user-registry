@@ -15,8 +15,9 @@ RUN apk add --no-cache make gcc g++ python libtool autoconf automake && \
     cd $(npm root -g)/npm && \
     apk add -U iproute2 && ln -s /usr/lib/tc /lib/tc && \
     apk add -U iptables && \
+    npm config set unsafe-perm true && \
     npm install -g node-gyp
-    
+
 RUN npm install -g tape tap-xunit
 RUN npm install
 
